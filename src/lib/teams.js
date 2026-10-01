@@ -1,4 +1,4 @@
-import { POSITIONS, GROUPS, SUB, groupOf } from '../public/positions.js';
+import { POSITIONS, GROUPS, SUB, groupOf } from './positions.js';
 
 const GROUP_ORDER = Object.keys(GROUPS); // GK, DEF, MID, FWD
 const POSITION_PENALTY = 6; // rating points one extra player in a position group is "worth"

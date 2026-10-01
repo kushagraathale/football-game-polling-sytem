@@ -1,4 +1,9 @@
 node_modules/
-data/
-*.tmp
+dist/
+.astro/
+.wrangler/
+.dev.vars*
+.env
+.env.production
+.tmp/
 .DS_Store

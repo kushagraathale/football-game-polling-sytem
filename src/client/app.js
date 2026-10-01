@@ -1,8 +1,10 @@
-import { POSITIONS, GROUPS, MAX_PLAYERS, SUB, groupOf, positionByCode } from './positions.js';
+import { POSITIONS, GROUPS, MAX_PLAYERS, SUB, groupOf, positionByCode } from '../lib/positions.js';
 
 const app = document.getElementById('app');
 const nav = document.getElementById('nav');
 const ME_KEY = 'matchday.me';
+// The app can live under a sub-path (e.g. /matchday on a Webflow site).
+const API_BASE = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`;
 
 let me = null;
 let players = [];
@@ -14,7 +16,7 @@ const esc = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 async function api(path, { method = 'GET', body } = {}) {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,

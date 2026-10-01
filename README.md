@@ -11,36 +11,48 @@ A minimal, light, pastel web app for running a weekly 9-a-side game: **8 players
 - **Player scores out of 100**: everyone starts at 60. After each game, a player's score moves 35% of the way towards their match score (average peer rating × 10). Good form counts, but one game can't swing a score wildly. Future teams are balanced using these scores.
 - **Player cards**: name, age, position and rating, colour-coded by position line. The "Me" page shows your card, your rating history, and lets you edit your profile.
 
-## Running it
+## Running it locally
 
-Needs Node.js 18+ and has **no dependencies**.
+Needs Node.js 22.12+.
 
 ```bash
-npm start          # http://localhost:3000
-npm test           # unit + API tests
+npm install
+npm run dev        # http://localhost:4321/CLOUD_MOUNT_PATH  (sets up a local database first)
+npm test           # unit, API and storage tests
 ```
 
-Environment variables:
+`CLOUD_MOUNT_PATH` in `astro.config.mjs` is a placeholder that Webflow Cloud replaces with the app's real mount path (e.g. `/matchday`) at deploy time.
 
-| Variable    | Default         | Purpose                     |
-|-------------|-----------------|-----------------------------|
-| `PORT`      | `3000`          | HTTP port                   |
-| `DATA_FILE` | `data/db.json`  | Where the JSON database is saved |
+## Hosting on Webflow Cloud
+
+This is an [Astro](https://astro.build) app set up for [Webflow Cloud](https://webflow.com/cloud), which runs it on Cloudflare Workers with a D1 (SQLite) database:
+
+- `webflow.json` tells Webflow it's an Astro app.
+- `wrangler.json` declares the `DB` database, and Webflow creates it on the first deploy.
+- `migrations/` sets up the table, and Webflow runs it automatically.
+
+Once the app is connected to this GitHub repo and branch in the Webflow dashboard, every push deploys automatically.
 
 ## How it's built
 
 ```
-server.js          HTTP server entry point
-lib/app.js         REST API + static file serving
-lib/teams.js       team balancing and pitch-slot assignment
-lib/game.js        poll roster (cap + waitlist) and rating maths
-lib/store.js       atomic JSON-file persistence
-public/            single-page frontend (vanilla JS, hash routing)
-public/positions.js  formation/positions shared by client and server
-test/              node:test suites
+src/pages/index.astro        the page shell
+src/pages/api/[...path].js   API endpoint (connects the API to the D1 database)
+src/client/                  single-page frontend (vanilla JS, hash routing) + pastel styles
+src/lib/api.js               REST API (standard Request/Response)
+src/lib/teams.js             team balancing and pitch-slot assignment
+src/lib/game.js              poll roster (cap + waitlist) and rating maths
+src/lib/store.js             D1 storage with safe concurrent writes (+ in-memory store for tests)
+src/lib/positions.js         formation/positions shared by client and server
+migrations/                  D1 schema
+test/                        node:test suites
 ```
 
+All state is a single JSON document in one D1 row with a version number. If two people save at the same moment, the second save is retried on fresh data instead of overwriting the first.
+
 ### API
+
+All routes live under `<mount>/api`.
 
 | Method | Path | Body |
 |---|---|---|

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildRoster, computeScores } from '../lib/game.js';
-import { DEFAULT_RATING, MAX_PLAYERS } from '../public/positions.js';
+import { buildRoster, computeScores } from '../src/lib/game.js';
+import { DEFAULT_RATING, MAX_PLAYERS } from '../src/lib/positions.js';
 
 const player = (id) => ({ id, firstName: id, lastName: 'X', position: 'CM', rating: 60 });
 

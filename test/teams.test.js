@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildTeams, assignSlots, teamStats } from '../lib/teams.js';
-import { POSITIONS, SUB } from '../public/positions.js';
+import { buildTeams, assignSlots, teamStats } from '../src/lib/teams.js';
+import { POSITIONS, SUB } from '../src/lib/positions.js';
 
 const squad = (specs) => specs.map(([position, rating], i) => ({ id: `p${i}`, name: `Player ${i}`, position, rating }));
 

@@ -1,23 +1,15 @@
-import { test, before, after } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import http from 'node:http';
-import { createApp } from '../lib/app.js';
-import { Store } from '../lib/store.js';
-import { POSITIONS } from '../public/positions.js';
+import { handleApi } from '../src/lib/api.js';
+import { MemoryStore } from '../src/lib/store.js';
+import { POSITIONS } from '../src/lib/positions.js';
 
-let server;
-let base;
-
-before(async () => {
-  const store = await new Store().load();
-  server = http.createServer(createApp(store));
-  await new Promise((r) => server.listen(0, r));
-  base = `http://localhost:${server.address().port}`;
-});
-after(() => server.close());
+const store = new MemoryStore();
 
 async function call(method, path, body) {
-  const res = await fetch(base + path, { method, headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
+  const url = new URL(path, 'http://localhost');
+  const request = new Request(url, { method, headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
+  const res = await handleApi(request, url.pathname.replace(/^\/api/, ''), store);
   return { status: res.status, body: await res.json() };
 }
 
@@ -78,10 +70,8 @@ test('full game flow: onboard, poll, teams, play, rate', async () => {
   assert.equal(find(players[17].id).games, 0);
 });
 
-test('serves the app and blocks path traversal', async () => {
-  const res = await fetch(`${base}/`);
-  assert.equal(res.status, 200);
-  assert.match(await res.text(), /Matchday/);
-  const sneaky = await fetch(`${base}/..%2fpackage.json`);
-  assert.equal(sneaky.status, 404);
+test('unknown routes and bad JSON are rejected cleanly', async () => {
+  assert.equal((await call('GET', '/api/nope')).status, 404);
+  const res = await handleApi(new Request('http://localhost/api/players', { method: 'POST', body: '{oops' }), '/players', store);
+  assert.equal(res.status, 400);
 });

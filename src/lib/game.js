@@ -1,4 +1,4 @@
-import { DEFAULT_RATING, GUEST_RATING, MAX_PLAYERS } from '../public/positions.js';
+import { DEFAULT_RATING, GUEST_RATING, MAX_PLAYERS } from './positions.js';
 
 export const RATING_WEIGHT = 0.35; // how far one game moves a player's score towards their match rating
 export const MIN_SCORE = 1;
