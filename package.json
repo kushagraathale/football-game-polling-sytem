@@ -1,0 +1,16 @@
+{
+  "name": "matchday-nine-a-side",
+  "version": "1.0.0",
+  "description": "Organise 9-a-side football games: onboarding, polling, balanced teams and peer ratings.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
